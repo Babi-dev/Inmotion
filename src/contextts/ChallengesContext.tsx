@@ -3,6 +3,8 @@ import Cookies from 'js-cookie';
 
 import challenges from '../../challenges.json';
 
+import { LevelUpModal } from '../components/LevelUpModal';
+
 interface Challenge {
     type: 'boddy' | 'eye';
     description: string;
@@ -19,6 +21,7 @@ interface ChallengesContextData {
     startNewChallenge: () => void;
     resetChallenge: () => void;
     completeChallenge: () => void;
+    closeLevelUpModal: () => void
 }
 
 interface ChallengesProviderProps {
@@ -39,6 +42,7 @@ export function ChallengesProvider({
     const [challengesCompleted, setChallengesCompleted] = useState(rest.challengesCompleted ?? 0);
 
     const [activeChallenge, setActiveChallenge] = useState(null);
+    const [isLevelModalOpen, setIsLevelModalOpen] = useState(false);
 
     const experienceNextLevel = useMemo(() => {
         return Math.pow((level + 1) * 4, 2);
@@ -56,7 +60,12 @@ export function ChallengesProvider({
 
     const levelUp = useCallback(() => {
         setLevel(level + 1);
+        setIsLevelModalOpen(true);
     },[level]);
+
+    const closeLevelUpModal = useCallback(() => {
+        setIsLevelModalOpen(false);
+    },[]);
 
     const startNewChallenge = useCallback(() => {
         const radonChallengesIndex = Math.floor(Math.random() * challenges.length);
@@ -106,10 +115,12 @@ export function ChallengesProvider({
                 levelUp,
                 startNewChallenge,
                 resetChallenge,
-                completeChallenge
+                completeChallenge,
+                closeLevelUpModal
             }}
         >
             {children}
+            {isLevelModalOpen && <LevelUpModal />}
         </ChallengesContext.Provider>
     );
 }
